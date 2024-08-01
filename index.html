@@ -1,14 +1,40 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Racing Bar Chart</title>
-    <script src="https://d3js.org/d3.v6.min.js"></script>
-    <script src="racingBarChart.js"></script>
-</head>
-<body>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+  </head>
+  <body>
     <svg width="960" height="600"></svg>
-    <script src="racing-bar-chart.js"></script>
-</body>
+    <script>
+      const margin = { top: 20, right: 30, bottom: 40, left: 90 },
+        width = 800 - margin.left - margin.right,
+        height = 500 - margin.top - margin.bottom;
+
+      const svg = d3
+        .select("body")
+        .append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+        .append("g")
+        .attr("transform", `translate(${margin.left},${margin.top})`);
+
+
+      //loading the json file
+
+      d3.json("n_df.json").then(data => {
+        const years = Object.keys(data.Africa);
+        const continents = Object.keys(data);
+
+        const formatted_data = years.map(year => {
+          let year_data = { year: year };
+          continents.forEach(continent => {
+            year_data[continent] = data[continent][year];
+          });
+          return year_data;
+        });
+    </script>
+  </body>
 </html>
