@@ -20,6 +20,15 @@
         .append("g")
         .attr("transform", `translate(${margin.left},${margin.top})`);
 
+      const yearText = svg
+        .append("text")
+        .attr("x", width / 2)
+        .attr("y", height / 2)
+        .attr("text-anchor", "middle")
+        .attr("font-size", "48px")
+        .attr("font-weight", "bold")
+        .style("fill", "grey");
+
       //loading the json file
 
       d3.json("n_df.json")
@@ -80,6 +89,7 @@
               .attr("fill", (d) => color(d.continent));
 
             bars.exit().remove();
+            yearText.text(year_data.year);
           }
           update(formatted_data[0]);
 
@@ -92,6 +102,16 @@
         })
         .catch((error) => {
           console.error("Error loading data:", error);
+
+          //adding year in the center
+          const yearText = svg
+            .append("text")
+            .attr("x", width / 2)
+            .attr("y", height / 2)
+            .attr("text-anchor", "middle")
+            .attr("font-size", "48px")
+            .attr("font-weight", "bold")
+            .style("fill", "grey");
         });
     </script>
   </body>
