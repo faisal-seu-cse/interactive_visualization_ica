@@ -7,7 +7,6 @@
     <script src="https://d3js.org/d3.v7.min.js"></script>
   </head>
   <body>
-    <svg width="960" height="600"></svg>
     <script>
       const margin = { top: 20, right: 30, bottom: 40, left: 90 },
         width = 800 - margin.left - margin.right,
@@ -23,34 +22,77 @@
 
       //loading the json file
 
-      d3.json("n_df.json").then((data) => {
-        const years = Object.keys(data.Africa);
-        const continents = Object.keys(data);
+      d3.json("n_df.json")
+        .then((data) => {
+          const years = Object.keys(data.Africa);
+          const continents = Object.keys(data);
 
-        const formatted_data = years.map((year) => {
-          let year_data = { year: year };
-          continents.forEach((continent) => {
-            year_data[continent] = data[continent][year];
+          const formatted_data = years.map((year) => {
+            let year_data = { year: year };
+            continents.forEach((continent) => {
+              year_data[continent] = data[continent][year];
+            });
+            return year_data;
           });
-          return year_data;
+
+          //colors for continent bars
+          const color = d3.scaleOrdinal(d3.schemeCategory10).domain(continents);
+
+          // setting axises
+
+          const x = d3.scaleLinear().range([0, width]);
+
+          const xAxis = svg
+            .append("g")
+            .attr("transform", `translate(0,${height})`)
+            .call(d3.axisBottom(x));
+
+          const y = d3.scaleBand().range([0, height]).padding(0.1);
+
+          const yAxis = svg.append("g").call(d3.axisLeft(y));
+
+          //update chart with the data
+
+          function update(year_data) {
+            x.domain([0, d3.max(Object.values(year_data).slice(1))]);
+            xAxis.transition().duration(1000).call(d3.axisBottom(x));
+
+            y.domain(continents);
+            yAxis.transition().duration(1000).call(d3.axisLeft(y));
+
+            const bars = svg.selectAll("rect").data(
+              continents.map((continent) => ({
+                continent: continent,
+                value: year_data[continent],
+              }))
+            );
+
+            bars
+              .enter()
+              .append("rect")
+              .merge(bars)
+              .transition()
+              .duration(1000)
+              .attr("x", x(0))
+              .attr("y", (d) => y(d.continent))
+              .attr("width", (d) => x(d.value))
+              .attr("height", y.bandwidth())
+              .attr("fill", (d) => color(d.continent));
+
+            bars.exit().remove();
+          }
+          update(formatted_data[0]);
+
+          // chart every 2 seconds with the next year
+          let yearIndex = 0;
+          setInterval(() => {
+            yearIndex = (yearIndex + 1) % formatted_data.length;
+            update(formatted_data[yearIndex]);
+          }, 2000);
+        })
+        .catch((error) => {
+          console.error("Error loading data:", error);
         });
-
-        //colors for continent bars
-        const color = d3.scaleOrdinal(d3.schemeCategory10).domain(continents);
-
-        // setting axises
-
-        const x = d3.scaleLinear().range([0, width]);
-
-        const xAxis = svg
-          .append("g")
-          .attr("transform", `translate(0,${height})`)
-          .call(d3.axisBottom(x));
-
-        const y = d3.scaleBand().range([0, height]).padding(0.1);
-
-        const yAxis = svg.append("g").call(d3.axisLeft(y));
-      });
     </script>
   </body>
 </html>
