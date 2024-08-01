@@ -21,24 +21,36 @@
         .append("g")
         .attr("transform", `translate(${margin.left},${margin.top})`);
 
-
       //loading the json file
 
-      d3.json("n_df.json").then(data => {
+      d3.json("n_df.json").then((data) => {
         const years = Object.keys(data.Africa);
         const continents = Object.keys(data);
 
-        const formatted_data = years.map(year => {
+        const formatted_data = years.map((year) => {
           let year_data = { year: year };
-          continents.forEach(continent => {
+          continents.forEach((continent) => {
             year_data[continent] = data[continent][year];
           });
           return year_data;
         });
 
         //colors for continent bars
-        const color = d3.scaleOrdinal(d3.schemeCategory10)
-        .domain(continents);
+        const color = d3.scaleOrdinal(d3.schemeCategory10).domain(continents);
+
+        // setting axises
+
+        const x = d3.scaleLinear().range([0, width]);
+
+        const xAxis = svg
+          .append("g")
+          .attr("transform", `translate(0,${height})`)
+          .call(d3.axisBottom(x));
+
+        const y = d3.scaleBand().range([0, height]).padding(0.1);
+
+        const yAxis = svg.append("g").call(d3.axisLeft(y));
+      });
     </script>
   </body>
 </html>
