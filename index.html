@@ -35,6 +35,10 @@
           });
           return year_data;
         });
+
+        //colors for continent bars
+        const color = d3.scaleOrdinal(d3.schemeCategory10)
+        .domain(continents);
     </script>
   </body>
 </html>
